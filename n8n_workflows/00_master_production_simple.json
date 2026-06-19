@@ -1,0 +1,64 @@
+﻿# Installation Guide
+
+This project is designed for local Windows production.
+
+## Requirements
+
+- Python
+- FFmpeg
+- n8n
+- Wav2Lip
+- Edge TTS
+- Character images prepared for lip sync
+
+## n8n URL
+
+If n8n runs in Docker, use:
+
+`	ext
+http://host.docker.internal:8110/produce-episode
+`
+
+If n8n runs directly on Windows, use:
+
+`	ext
+http://127.0.0.1:8110/produce-episode
+`
+"@ | Set-Content -Path "D:\AI_Creative_Factory_GitHub\docs\INSTALL.md" -Encoding UTF8
+
+@"
+[
+  {
+    "name": "00_master_production_simple",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [-400, 0],
+        "id": "manual-start",
+        "name": "Manual Start"
+      },
+      {
+        "parameters": {
+          "url": "http://host.docker.internal:8110/produce-episode",
+          "options": {
+            "timeout": 1800000
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [-120, 0],
+        "id": "run-production-pipeline",
+        "name": "Run Production Pipeline"
+      }
+    ],
+    "connections": {
+      "Manual Start": {
+        "main": [[{"node": "Run Production Pipeline", "type": "main", "index": 0}]]
+      }
+    },
+    "settings": {"executionOrder": "v1"},
+    "active": false
+  }
+]
