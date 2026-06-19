@@ -1,0 +1,45 @@
+﻿# Runtime outputs
+final/
+output/
+temp/
+cache/
+logs/
+
+# Generated media
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mov
+*.mkv
+
+# AI models / checkpoints
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+models/
+checkpoints/
+
+# Secrets and credentials
+.env
+*.env
+credentials/
+secrets/
+*.key
+*.pem
+token.json
+client_secret*.json
+
+# Local files
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# n8n private exports
+n8n_workflows_export.json
+
+# Private character images
+characters/bob/*.png
+characters/nova/*.png

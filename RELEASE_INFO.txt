@@ -1,0 +1,8 @@
+﻿AI Creative Factory - GitHub Clean Release
+
+Generated at: 2026-06-19 22:59:37
+Source: D:\AI_Creative_Factory
+Destination: D:\AI_Creative_Factory_GitHub
+
+Review this folder before uploading to GitHub.
+Do not upload the original production folder directly.
