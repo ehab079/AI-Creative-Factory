@@ -1,0 +1,120 @@
+name: AI Creative Factory Validation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  validate-project:
+    name: Validate Python, JSON and IP Proof
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Show project files
+        run: |
+          echo "AI Creative Factory files:"
+          find . -maxdepth 3 -type f
+
+      - name: Check Python syntax
+        run: |
+          echo "Checking Python files..."
+          python -m compileall .
+
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON files..."
+          python - << 'PY'
+          import json
+          from pathlib import Path
+
+          json_files = list(Path(".").rglob("*.json"))
+
+          if not json_files:
+              print("No JSON files found.")
+          else:
+              for file in json_files:
+                  print(f"Checking {file}")
+                  with open(file, "r", encoding="utf-8-sig") as f:
+                      json.load(f)
+
+              print(f"Validated {len(json_files)} JSON file(s).")
+          PY
+
+      - name: Generate SHA256 IP proof report
+        run: |
+          echo "Generating SHA256 ownership proof..."
+          python - << 'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          important_extensions = {
+              ".py", ".json", ".txt", ".md", ".yml", ".yaml"
+          }
+
+          excluded_dirs = {
+              ".git", "__pycache__", ".github/workflows"
+          }
+
+          files = []
+
+          for path in Path(".").rglob("*"):
+              if not path.is_file():
+                  continue
+
+              path_str = str(path).replace("\\", "/")
+
+              if any(part in path_str for part in excluded_dirs):
+                  continue
+
+              if path.suffix.lower() not in important_extensions:
+                  continue
+
+              sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+
+              files.append({
+                  "file": path_str,
+                  "sha256": sha256,
+                  "size_bytes": path.stat().st_size
+              })
+
+          report = {
+              "project": "AI Creative Factory",
+              "owner": "Ehab Shehab",
+              "copyright": "Copyright © 2026 Ehab Shehab. All rights reserved.",
+              "license": "Private / All rights reserved unless otherwise stated.",
+              "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+              "files_count": len(files),
+              "files": files
+          }
+
+          output_dir = Path("ip_rights_proof")
+          output_dir.mkdir(exist_ok=True)
+
+          with open(output_dir / "ownership_hash_report.json", "w", encoding="utf-8") as f:
+              json.dump(report, f, ensure_ascii=False, indent=2)
+
+          print(f"Generated report for {len(files)} file(s).")
+          PY
+
+      - name: Upload IP proof report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-creative-factory-ip-proof
+          path: ip_rights_proof/ownership_hash_report.json
